@@ -1,7 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
-
 dotenv.config();
+
+import { query } from './db.js';
 
 const {
   PORT: port = 3000
@@ -9,11 +10,17 @@ const {
 
 const app = express();
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  const result = await query('SELECT * FROM people;');
+
+  const rows = result.rows;
+  console.log('result :>> ', result);
+
+  const names = rows.map(r => r.name).join(', ');
   res.send(`
+${names}
 <form method="post" action="/post" enctype="application/x-www-form-urlencoded">
-  <input type="text" name="data">
-  <input type="file" name="file">
+  <input type="text" name="name">
   <button>Senda</button>
 </form>
   `);
@@ -21,9 +28,13 @@ app.get('/', (req, res) => {
 
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/post', (req, res) => {
-  console.log('req.body :>> ', req.body);
-  res.send(`POST gögn: ${JSON.stringify(req.body)}`);
+app.post('/post', async (req, res) => {
+  const name = req.body.name;
+  console.log('name :>> ', name);
+  
+  const result = await query('INSERT INTO people (name) VALUES ($1)', [name]);
+
+  res.redirect('/');
 });
 
 app.listen(port, () => {
