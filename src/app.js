@@ -1,4 +1,11 @@
 import express from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const {
+  PORT: port = 3000
+} = process.env;
 
 const app = express();
 
@@ -19,9 +26,6 @@ app.post('/post', (req, res) => {
   res.send(`POST gögn: ${JSON.stringify(req.body)}`);
 });
 
-const hostname = '127.0.0.1';
-const port = 3000;
-
-app.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });
