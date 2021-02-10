@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const {
-  DATABASE_URL: connectionString
+  DATABASE_URL: connectionString,
+  NODE_ENV: nodeEnv = 'development',
 } = process.env;
 
 console.log('process.env :>> ', process.env.DATABASE_URL);
@@ -13,7 +14,10 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const pool = new pg.Pool({ connectionString });
+// Notum SSL tengingu við gagnagrunn ef við erum *ekki* í development mode, þ.e.a.s. á local vél
+const ssl = nodeEnv !== 'development' ? { rejectUnauthorized: false } : false;
+
+const pool = new pg.Pool({ connectionString, ssl });
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
