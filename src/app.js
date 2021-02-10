@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import xss from 'xss';
 dotenv.config();
 
 import { query } from './db.js';
@@ -16,7 +17,7 @@ app.get('/', async (req, res) => {
   const rows = result.rows;
   console.log('result :>> ', result);
 
-  const names = rows.map(r => r.name).join(', ');
+  const names = rows.map(r => xss(r.name)).join(', ');
   res.send(`
 Nafnalisti: ${names}
 <form method="post" action="/post" enctype="application/x-www-form-urlencoded">
